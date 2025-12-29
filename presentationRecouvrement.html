@@ -2,7 +2,7 @@
 <html lang="fr" dir="ltr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Recouvrement des Créances Publiques au Maroc</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -21,7 +21,7 @@
                     },
                     colors: {
                         deepBlue: '#0f172a',
-                        glass: 'rgba(255, 255, 255, 0.05)',
+                        glass: 'rgba(30, 41, 59, 0.85)', // Darker glass for better mobile contrast
                         accent: '#06b6d4', // Cyan
                         secondary: '#10b981', // Emerald
                         purple: '#8b5cf6'
@@ -36,6 +36,9 @@
                             '0%, 100%': { transform: 'translateY(0)' },
                             '50%': { transform: 'translateY(-10px)' },
                         }
+                    },
+                    screens: {
+                        'xs': '375px', // Small phones
                     }
                 }
             }
@@ -43,13 +46,14 @@
     </script>
 
     <style>
-        /* GLOBAL STYLES & PRINT RESET */
+        /* GLOBAL STYLES */
         body {
             background-color: #0f172a;
             color: #f1f5f9;
-            overflow: hidden; /* Hide scrollbars for presentation mode */
+            overflow: hidden; /* Prevent body scroll, handle per slide */
             font-family: 'Cairo', sans-serif;
-            text-align: left; /* Force Left Alignment Global */
+            text-align: left;
+            -webkit-tap-highlight-color: transparent;
         }
 
         /* ANIMATED BACKGROUND CANVAS */
@@ -71,41 +75,68 @@
             box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
         }
 
-        /* SLIDE TRANSITIONS */
+        /* SLIDE TRANSITIONS & LAYOUT */
         .slide {
             display: none;
             opacity: 0;
             transform: translateY(20px);
-            transition: opacity 0.6s ease-out, transform 0.6s ease-out;
-            height: 100vh;
+            transition: opacity 0.5s ease-out, transform 0.5s ease-out;
+            height: 100dvh; /* Use dynamic viewport height for mobile browsers */
             width: 100vw;
             position: absolute;
             top: 0;
             left: 0;
-            padding: 3rem;
             box-sizing: border-box;
-            overflow-y: auto; 
-            display: flex; 
+            overflow-y: auto; /* Allow scrolling inside slide if content is long */
+            overflow-x: hidden;
             flex-direction: column;
-            justify-content: center;
-            align-items: flex-start; /* ALIGN ITEMS LEFT */
+            justify-content: flex-start; /* Start from top on mobile */
+            align-items: flex-start;
+            padding: 1.5rem; /* Mobile padding default */
+            padding-bottom: 5rem; /* Space for nav bar */
+        }
+
+        /* Desktop Adjustments */
+        @media (min-width: 768px) {
+            .slide {
+                justify-content: center;
+                padding: 3rem;
+            }
         }
 
         .slide.active {
             opacity: 1;
             transform: translateY(0);
             z-index: 10;
+            display: flex; /* Flex is crucial for alignment */
         }
 
-        /* NAVIGATION CONTROLS */
+        /* NAVIGATION CONTROLS - RESPONSIVE */
         .nav-controls {
             position: fixed;
-            bottom: 20px;
-            right: 20px; /* Controls on right for LTR */
             z-index: 50;
             display: flex;
-            gap: 1rem;
             align-items: center;
+            /* Mobile Default: Bottom Center */
+            bottom: 15px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 90%;
+            max-width: 400px;
+            justify-content: space-between;
+            padding: 0.75rem 1.5rem;
+        }
+
+        /* Desktop Nav: Bottom Right */
+        @media (min-width: 768px) {
+            .nav-controls {
+                left: auto;
+                right: 20px;
+                transform: none;
+                width: auto;
+                gap: 1rem;
+                bottom: 20px;
+            }
         }
 
         /* PRINT STYLES */
@@ -122,8 +153,6 @@
                 background: white;
                 color: black;
                 border-bottom: 1px solid #ccc;
-                align-items: flex-start;
-                text-align: left;
                 padding: 2rem;
             }
             .glass-card {
@@ -132,18 +161,16 @@
                 box-shadow: none;
                 color: black;
             }
-            h1, h2, h3, p { color: black !important; text-shadow: none !important; }
-            .text-accent, .text-secondary { color: #000 !important; font-weight: bold; }
+            h1, h2, h3, h4, p, li, span { color: black !important; text-shadow: none !important; }
+            .text-transparent { color: black !important; -webkit-text-fill-color: black !important; background: none !important; }
+            .hidden-print { display: none !important; }
         }
 
         /* CHART ANIMATIONS */
-        .bar-fill {
-            width: 0%;
-            transition: width 1.5s ease-out;
-        }
+        .bar-fill { width: 0%; transition: width 1.5s ease-out; }
         
-        /* SCROLLBAR CUSTOMIZATION */
-        ::-webkit-scrollbar { width: 8px; }
+        /* SCROLLBAR */
+        ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-track { background: #1e293b; }
         ::-webkit-scrollbar-thumb { background: #475569; border-radius: 4px; }
     </style>
@@ -154,81 +181,83 @@
 
     <main id="app" class="relative w-full h-full">
 
-        <section class="slide active space-y-6" id="slide-0">
-            <div class="relative w-32 h-32 mb-4 animate-float">
-                <svg viewBox="0 0 100 100" class="w-full h-full drop-shadow-[0_0_15px_rgba(6,182,212,0.5)]">
-                    <defs>
-                        <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
-                            <stop offset="0%" style="stop-color:#06b6d4;stop-opacity:1" />
-                            <stop offset="100%" style="stop-color:#10b981;stop-opacity:1" />
-                        </linearGradient>
-                    </defs>
-                    <circle cx="50" cy="50" r="45" stroke="url(#grad1)" stroke-width="2" fill="none" stroke-dasharray="10 5" class="animate-spin-slow origin-center" />
-                    <path d="M50 20 L80 35 V60 C80 80 50 95 50 95 C50 95 20 80 20 60 V35 L50 20 Z" fill="rgba(15, 23, 42, 0.8)" stroke="#fff" stroke-width="1.5" />
-                    <path d="M35 65 L45 50 L55 60 L70 35" fill="none" stroke="#34d399" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />
-                    <circle cx="35" cy="65" r="3" fill="#fff" />
-                    <circle cx="45" cy="50" r="3" fill="#fff" />
-                    <circle cx="55" cy="60" r="3" fill="#fff" />
-                    <circle cx="70" cy="35" r="3" fill="#fff" />
-                </svg>
-            </div>
+        <section class="slide active" id="slide-0">
+            <div class="flex flex-col justify-center min-h-full w-full">
+                <div class="relative w-24 h-24 md:w-32 md:h-32 mb-6 animate-float self-center md:self-start">
+                    <svg viewBox="0 0 100 100" class="w-full h-full drop-shadow-[0_0_15px_rgba(6,182,212,0.5)]">
+                        <defs>
+                            <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" style="stop-color:#06b6d4;stop-opacity:1" />
+                                <stop offset="100%" style="stop-color:#10b981;stop-opacity:1" />
+                            </linearGradient>
+                        </defs>
+                        <circle cx="50" cy="50" r="45" stroke="url(#grad1)" stroke-width="2" fill="none" stroke-dasharray="10 5" class="animate-spin-slow origin-center" />
+                        <path d="M50 20 L80 35 V60 C80 80 50 95 50 95 C50 95 20 80 20 60 V35 L50 20 Z" fill="rgba(15, 23, 42, 0.8)" stroke="#fff" stroke-width="1.5" />
+                        <path d="M35 65 L45 50 L55 60 L70 35" fill="none" stroke="#34d399" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />
+                        <circle cx="35" cy="65" r="3" fill="#fff" />
+                        <circle cx="45" cy="50" r="3" fill="#fff" />
+                        <circle cx="55" cy="60" r="3" fill="#fff" />
+                        <circle cx="70" cy="35" r="3" fill="#fff" />
+                    </svg>
+                </div>
 
-            <div class="space-y-4 text-left max-w-5xl">
-                <h3 class="text-xl text-cyan-400 tracking-widest uppercase font-bold">Master : Transformation Numérique des Finances Publiques</h3>
-                <h1 class="text-5xl md:text-7xl font-black text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-emerald-400 to-purple-500 py-2 leading-tight">
-                    Recouvrement des<br>Créances Publiques au Maroc
-                </h1>
-                <p class="text-slate-400 text-2xl border-l-4 border-purple-500 pl-4">Enjeux, Procédures et Digitalisation</p>
-            </div>
+                <div class="space-y-4 text-left max-w-5xl">
+                    <h3 class="text-sm md:text-xl text-cyan-400 tracking-widest uppercase font-bold">Master : Transformation Numérique</h3>
+                    <h1 class="text-3xl sm:text-4xl md:text-7xl font-black text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-emerald-400 to-purple-500 py-2 leading-tight">
+                        Recouvrement des<br>Créances Publiques
+                    </h1>
+                    <p class="text-slate-400 text-lg md:text-2xl border-l-4 border-purple-500 pl-4">Enjeux, Procédures et Digitalisation</p>
+                </div>
 
-            <div class="glass-card px-8 py-6 rounded-2xl mt-8 w-full max-w-4xl border-l-4 border-cyan-500">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 text-left">
-                    <div>
-                        <p class="text-sm text-slate-400 mb-2 uppercase tracking-wide">Présenté par :</p>
-                        <ul class="text-lg font-semibold text-white space-y-2">
-                            <li class="flex items-center"><i class="fas fa-user-graduate mr-3 text-cyan-400 w-4"></i> Mme DAOUDI Ibtihal</li>
-                            <li class="flex items-center"><i class="fas fa-user-graduate mr-3 text-purple-400 w-4"></i> Mme SADKI Imane</li>
-                            <li class="flex items-center"><i class="fas fa-user-graduate mr-3 text-emerald-400 w-4"></i> M. MERYMI Taha</li>
-                            <li class="flex items-center"><i class="fas fa-user-graduate mr-3 text-orange-400 w-4"></i> Mme DADI Fatine</li>
-                        </ul>
-                    </div>
-                    <div class="md:border-l border-slate-600 md:pl-8 flex flex-col justify-center">
-                        <p class="text-sm text-slate-400 mb-2 uppercase tracking-wide">Sous l'encadrement de :</p>
-                        <p class="text-2xl font-bold text-emerald-400"><i class="fas fa-chalkboard-teacher mr-2"></i> Pr. JDAINI TARIK</p>
+                <div class="glass-card px-4 py-6 md:px-8 md:py-6 rounded-2xl mt-8 w-full max-w-4xl border-l-4 border-cyan-500">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-left">
+                        <div>
+                            <p class="text-xs md:text-sm text-slate-400 mb-2 uppercase tracking-wide">Présenté par :</p>
+                            <ul class="text-sm md:text-lg font-semibold text-white space-y-2">
+                                <li class="flex items-center"><i class="fas fa-user-graduate mr-3 text-cyan-400 w-4"></i> Mme DAOUDI Ibtihal</li>
+                                <li class="flex items-center"><i class="fas fa-user-graduate mr-3 text-purple-400 w-4"></i> Mme SADKI Imane</li>
+                                <li class="flex items-center"><i class="fas fa-user-graduate mr-3 text-emerald-400 w-4"></i> M. MERYMI Taha</li>
+                                <li class="flex items-center"><i class="fas fa-user-graduate mr-3 text-orange-400 w-4"></i> Mme DADI Fatine</li>
+                            </ul>
+                        </div>
+                        <div class="border-t pt-4 md:border-t-0 md:pt-0 md:border-l border-slate-600 md:pl-8 flex flex-col justify-center">
+                            <p class="text-xs md:text-sm text-slate-400 mb-2 uppercase tracking-wide">Sous l'encadrement de :</p>
+                            <p class="text-lg md:text-2xl font-bold text-emerald-400"><i class="fas fa-chalkboard-teacher mr-2"></i> Pr. JDAINI TARIK</p>
+                        </div>
                     </div>
                 </div>
+                <p class="text-xs text-slate-500 mt-8 md:mt-12">Année Universitaire 2024 - 2025</p>
             </div>
-            <p class="text-xs text-slate-500 mt-12 self-start">Année Universitaire 2024 - 2025</p>
         </section>
 
         <section class="slide" id="slide-1">
-            <div class="max-w-6xl w-full">
-                <h2 class="text-4xl font-bold text-white mb-8 border-b border-slate-700 pb-4 flex items-center">
-                    <span class="bg-cyan-500 w-2 h-10 mr-4 rounded-full"></span>Introduction & Contexte
+            <div class="max-w-6xl w-full my-auto">
+                <h2 class="text-2xl md:text-4xl font-bold text-white mb-6 md:mb-8 border-b border-slate-700 pb-4 flex items-center">
+                    <span class="bg-cyan-500 w-2 h-8 md:h-10 mr-4 rounded-full"></span>Introduction
                 </h2>
                 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                    <div class="glass-card p-6 rounded-xl hover:bg-slate-800 transition duration-300 transform hover:-translate-y-1">
-                        <div class="flex items-center mb-4">
-                            <div class="w-12 h-12 rounded-full bg-blue-900 flex items-center justify-center mr-4 text-cyan-400 shadow-lg shadow-cyan-500/20">
-                                <i class="fas fa-book text-2xl"></i>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-8">
+                    <div class="glass-card p-4 md:p-6 rounded-xl">
+                        <div class="flex items-center mb-3">
+                            <div class="w-10 h-10 md:w-12 md:h-12 rounded-full bg-blue-900 flex items-center justify-center mr-3 text-cyan-400">
+                                <i class="fas fa-book text-lg md:text-2xl"></i>
                             </div>
-                            <h3 class="text-2xl font-bold text-white">Définition</h3>
+                            <h3 class="text-lg md:text-2xl font-bold text-white">Définition</h3>
                         </div>
-                        <p class="text-slate-300 leading-relaxed text-lg text-justify">
-                            Les créances publiques englobent l'ensemble des sommes dues à l'État, aux collectivités territoriales et aux établissements publics. Elles incluent principalement les impôts (directs et indirects), les taxes douanières, les amendes et les condamnations pécuniaires.
+                        <p class="text-slate-300 leading-relaxed text-sm md:text-lg text-justify">
+                            Les créances publiques englobent l'ensemble des sommes dues à l'État, aux collectivités territoriales et aux établissements publics (impôts, taxes, amendes).
                         </p>
                     </div>
 
-                    <div class="glass-card p-6 rounded-xl hover:bg-slate-800 transition duration-300 transform hover:-translate-y-1">
-                        <div class="flex items-center mb-4">
-                            <div class="w-12 h-12 rounded-full bg-emerald-900 flex items-center justify-center mr-4 text-emerald-400 shadow-lg shadow-emerald-500/20">
-                                <i class="fas fa-coins text-2xl"></i>
+                    <div class="glass-card p-4 md:p-6 rounded-xl">
+                        <div class="flex items-center mb-3">
+                            <div class="w-10 h-10 md:w-12 md:h-12 rounded-full bg-emerald-900 flex items-center justify-center mr-3 text-emerald-400">
+                                <i class="fas fa-coins text-lg md:text-2xl"></i>
                             </div>
-                            <h3 class="text-2xl font-bold text-white">Enjeu Stratégique</h3>
+                            <h3 class="text-lg md:text-2xl font-bold text-white">Enjeu Stratégique</h3>
                         </div>
-                        <p class="text-slate-300 leading-relaxed text-lg text-justify">
-                            Le recouvrement est le "poumon" du budget de l'État. Il assure le financement des politiques publiques. Son efficacité est un indicateur majeur de la gouvernance financière et de la crédibilité de l'administration fiscale vis-à-vis des citoyens.
+                        <p class="text-slate-300 leading-relaxed text-sm md:text-lg text-justify">
+                            Le recouvrement est le "poumon" du budget de l'État. Il assure le financement des politiques publiques et reflète la crédibilité de l'administration.
                         </p>
                     </div>
                 </div>
@@ -236,89 +265,88 @@
         </section>
 
         <section class="slide" id="slide-2">
-            <div class="max-w-5xl w-full text-left">
-                <div class="mb-6 inline-block p-4 rounded-full bg-slate-800 border border-slate-600 shadow-lg shadow-cyan-500/20 animate-pulse-slow">
-                    <i class="fas fa-question text-6xl text-gradient bg-clip-text text-transparent bg-gradient-to-b from-cyan-400 to-purple-500">?</i>
+            <div class="max-w-5xl w-full text-left my-auto">
+                <div class="mb-4 md:mb-6 inline-block p-3 md:p-4 rounded-full bg-slate-800 border border-slate-600 shadow-lg shadow-cyan-500/20 animate-pulse-slow">
+                    <i class="fas fa-question text-4xl md:text-6xl text-gradient bg-clip-text text-transparent bg-gradient-to-b from-cyan-400 to-purple-500">?</i>
                 </div>
                 
-                <h2 class="text-5xl font-bold text-white mb-12">La Problématique</h2>
+                <h2 class="text-3xl md:text-5xl font-bold text-white mb-6 md:mb-12">La Problématique</h2>
                 
-                <div class="glass-card p-10 rounded-2xl relative overflow-hidden group border-l-8 border-cyan-500">
-                    <p class="text-3xl font-light leading-normal text-slate-100">
-                        "Comment l'administration marocaine peut-elle optimiser le recouvrement des créances publiques tout en garantissant l'équité et les droits des contribuables, à l'ère de la <span class="font-bold text-cyan-400">transformation numérique</span> ?"
+                <div class="glass-card p-6 md:p-10 rounded-2xl relative overflow-hidden group border-l-4 md:border-l-8 border-cyan-500">
+                    <p class="text-xl md:text-3xl font-light leading-snug md:leading-normal text-slate-100">
+                        "Comment optimiser le recouvrement des créances publiques tout en garantissant l'équité, à l'ère de la <span class="font-bold text-cyan-400">transformation numérique</span> ?"
                     </p>
-                    <i class="fas fa-quote-right absolute bottom-4 right-4 text-8xl text-white opacity-5"></i>
                 </div>
 
-                <div class="flex justify-start mt-12 space-x-12">
-                    <div class="text-center group cursor-default">
-                        <div class="w-16 h-16 rounded-full bg-emerald-900/50 flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition">
-                            <i class="fas fa-chart-line text-3xl text-emerald-400"></i>
+                <div class="flex flex-wrap justify-start mt-8 md:mt-12 gap-6 md:gap-12">
+                    <div class="text-center w-24 md:w-auto">
+                        <div class="w-12 h-12 md:w-16 md:h-16 rounded-full bg-emerald-900/50 flex items-center justify-center mx-auto mb-2 md:mb-3">
+                            <i class="fas fa-chart-line text-xl md:text-3xl text-emerald-400"></i>
                         </div>
-                        <div class="text-slate-300 text-sm uppercase tracking-wide font-bold">Efficacité</div>
+                        <div class="text-slate-300 text-xs md:text-sm uppercase tracking-wide font-bold">Efficacité</div>
                     </div>
                     
-                    <div class="text-center group cursor-default">
-                        <div class="w-16 h-16 rounded-full bg-purple-900/50 flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition">
-                            <i class="fas fa-balance-scale text-3xl text-purple-400"></i>
+                    <div class="text-center w-24 md:w-auto">
+                        <div class="w-12 h-12 md:w-16 md:h-16 rounded-full bg-purple-900/50 flex items-center justify-center mx-auto mb-2 md:mb-3">
+                            <i class="fas fa-balance-scale text-xl md:text-3xl text-purple-400"></i>
                         </div>
-                        <div class="text-slate-300 text-sm uppercase tracking-wide font-bold">Équité</div>
+                        <div class="text-slate-300 text-xs md:text-sm uppercase tracking-wide font-bold">Équité</div>
                     </div>
                     
-                    <div class="text-center group cursor-default">
-                        <div class="w-16 h-16 rounded-full bg-cyan-900/50 flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition">
-                            <i class="fas fa-laptop-code text-3xl text-cyan-400"></i>
+                    <div class="text-center w-24 md:w-auto">
+                        <div class="w-12 h-12 md:w-16 md:h-16 rounded-full bg-cyan-900/50 flex items-center justify-center mx-auto mb-2 md:mb-3">
+                            <i class="fas fa-laptop-code text-xl md:text-3xl text-cyan-400"></i>
                         </div>
-                        <div class="text-slate-300 text-sm uppercase tracking-wide font-bold">Digitalisation</div>
+                        <div class="text-slate-300 text-xs md:text-sm uppercase tracking-wide font-bold">Digital</div>
                     </div>
                 </div>
             </div>
         </section>
 
         <section class="slide" id="slide-3">
-            <div class="max-w-6xl w-full">
-                <h2 class="text-4xl font-bold text-white mb-10 border-b border-slate-700 pb-4">
-                    <span class="text-emerald-400 mr-2">#</span> Plan de la présentation
+            <div class="max-w-6xl w-full my-auto">
+                <h2 class="text-2xl md:text-4xl font-bold text-white mb-6 md:mb-10 border-b border-slate-700 pb-4">
+                    <span class="text-emerald-400 mr-2">#</span> Plan
                 </h2>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div class="glass-card p-5 rounded-lg flex items-center hover:translate-x-2 transition duration-300 cursor-pointer border-l-4 border-cyan-500 group">
-                        <span class="text-5xl font-black text-slate-700 mr-5 group-hover:text-cyan-500 transition">01</span>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+                    <div class="glass-card p-4 md:p-5 rounded-lg flex items-center border-l-4 border-cyan-500">
+                        <span class="text-3xl md:text-5xl font-black text-slate-700 mr-4 md:mr-5">01</span>
                         <div>
-                            <h3 class="text-xl font-bold text-white group-hover:text-cyan-400 transition">Cadre Juridique et Institutionnel</h3>
-                            <p class="text-slate-400 text-sm mt-1">Loi 15-97 et les acteurs clés (TGR, DGI, Douane)</p>
+                            <h3 class="text-lg md:text-xl font-bold text-white">Cadre Juridique</h3>
+                            <p class="text-slate-400 text-xs md:text-sm mt-1">Loi 15-97 et Acteurs (TGR, DGI)</p>
                         </div>
                     </div>
 
-                    <div class="glass-card p-5 rounded-lg flex items-center hover:translate-x-2 transition duration-300 cursor-pointer border-l-4 border-purple-500 group">
-                        <span class="text-5xl font-black text-slate-700 mr-5 group-hover:text-purple-500 transition">02</span>
+                    <div class="glass-card p-4 md:p-5 rounded-lg flex items-center border-l-4 border-purple-500">
+                        <span class="text-3xl md:text-5xl font-black text-slate-700 mr-4 md:mr-5">02</span>
                         <div>
-                            <h3 class="text-xl font-bold text-white group-hover:text-purple-400 transition">Processus de Recouvrement</h3>
-                            <p class="text-slate-400 text-sm mt-1">Phase amiable et phase forcée</p>
+                            <h3 class="text-lg md:text-xl font-bold text-white">Processus</h3>
+                            <p class="text-slate-400 text-xs md:text-sm mt-1">Amiable vs Forcé</p>
                         </div>
                     </div>
 
-                     <div class="glass-card p-5 rounded-lg flex items-center hover:translate-x-2 transition duration-300 cursor-pointer border-l-4 border-emerald-500 group">
-                        <span class="text-5xl font-black text-slate-700 mr-5 group-hover:text-emerald-500 transition">03</span>
+                     <div class="glass-card p-4 md:p-5 rounded-lg flex items-center border-l-4 border-emerald-500">
+                        <span class="text-3xl md:text-5xl font-black text-slate-700 mr-4 md:mr-5">03</span>
                         <div>
-                            <h3 class="text-xl font-bold text-white group-hover:text-emerald-400 transition">Analyse Statistique</h3>
-                            <p class="text-slate-400 text-sm mt-1">Données réelles et évolution des recettes</p>
+                            <h3 class="text-lg md:text-xl font-bold text-white">Statistiques</h3>
+                            <p class="text-slate-400 text-xs md:text-sm mt-1">Données TGR & DGI</p>
                         </div>
                     </div>
 
-                    <div class="glass-card p-5 rounded-lg flex items-center hover:translate-x-2 transition duration-300 cursor-pointer border-l-4 border-orange-500 group">
-                        <span class="text-5xl font-black text-slate-700 mr-5 group-hover:text-orange-500 transition">04</span>
+                    <div class="glass-card p-4 md:p-5 rounded-lg flex items-center border-l-4 border-orange-500">
+                        <span class="text-3xl md:text-5xl font-black text-slate-700 mr-4 md:mr-5">04</span>
                         <div>
-                            <h3 class="text-xl font-bold text-white group-hover:text-orange-400 transition">Défis et Obstacles</h3>
-                            <p class="text-slate-400 text-sm mt-1">Le "Reste à Recouvrer" (RAR) et l'informel</p>
+                            <h3 class="text-lg md:text-xl font-bold text-white">Défis (RAR)</h3>
+                            <p class="text-slate-400 text-xs md:text-sm mt-1">Informel et obstacles</p>
                         </div>
                     </div>
 
-                    <div class="glass-card p-5 rounded-lg flex items-center hover:translate-x-2 transition duration-300 cursor-pointer border-l-4 border-blue-500 md:col-span-2 group">
-                        <span class="text-5xl font-black text-slate-700 mr-5 group-hover:text-blue-500 transition">05</span>
+                    <div class="glass-card p-4 md:p-5 rounded-lg flex items-center border-l-4 border-blue-500 md:col-span-2">
+                        <span class="text-3xl md:text-5xl font-black text-slate-700 mr-4 md:mr-5">05</span>
                         <div>
-                            <h3 class="text-xl font-bold text-white group-hover:text-blue-400 transition">Transformation Numérique (Focus Master)</h3>
-                            <p class="text-slate-400 text-sm mt-1">E-recouvrement, SIMPL, et l'usage de la Data</p>
+                            <h3 class="text-lg md:text-xl font-bold text-white">Transformation Numérique</h3>
+                            <p class="text-slate-400 text-xs md:text-sm mt-1">SIMPL, Data & E-recouvrement</p>
                         </div>
                     </div>
                 </div>
@@ -326,55 +354,45 @@
         </section>
 
         <section class="slide" id="slide-4">
-            <div class="max-w-6xl w-full">
-                <h2 class="text-3xl font-bold text-white mb-8">Cadre Juridique et Acteurs</h2>
+            <div class="max-w-6xl w-full my-auto">
+                <h2 class="text-2xl md:text-3xl font-bold text-white mb-6 md:mb-8">Cadre Juridique</h2>
                 
                 <div class="flex flex-col md:flex-row gap-6">
-                    <div class="md:w-1/3 space-y-4">
-                        <div class="glass-card p-6 rounded-xl border-l-4 border-yellow-500">
-                            <h3 class="text-xl font-bold text-white mb-2"><i class="fas fa-gavel mr-2 text-yellow-500"></i> La Loi 15-97</h3>
+                    <div class="w-full md:w-1/3">
+                        <div class="glass-card p-4 md:p-6 rounded-xl border-l-4 border-yellow-500">
+                            <h3 class="text-lg md:text-xl font-bold text-white mb-2"><i class="fas fa-gavel mr-2 text-yellow-500"></i> La Loi 15-97</h3>
                             <p class="text-slate-300 text-sm text-justify leading-relaxed">
-                                Promulguée le 13 juin 2000, elle forme le code de recouvrement des créances publiques (CRCP). Elle vise à harmoniser les procédures et à renforcer les garanties du Trésor tout en protégeant les droits du débiteur.
+                                Code de recouvrement des créances publiques (CRCP). Vise à harmoniser les procédures et renforcer les garanties du Trésor.
                             </p>
-                            <div class="mt-4 pt-4 border-t border-slate-700">
-                                <span class="text-xs text-slate-400 uppercase font-bold">Objectifs :</span>
-                                <ul class="mt-2 space-y-2 text-sm text-slate-300">
-                                    <li class="flex items-center"><i class="fas fa-check-circle text-green-500 mr-2"></i> Unification des actions</li>
-                                    <li class="flex items-center"><i class="fas fa-check-circle text-green-500 mr-2"></i> Rapidité de l'action</li>
-                                </ul>
-                            </div>
                         </div>
                     </div>
 
-                    <div class="md:w-2/3 glass-card p-6 rounded-xl flex flex-col justify-center items-center relative overflow-hidden">
-                        <h3 class="text-center text-white mb-8 font-bold text-lg">L'Écosystème du Recouvrement</h3>
+                    <div class="w-full md:w-2/3 glass-card p-4 md:p-6 rounded-xl flex flex-col justify-center items-center relative overflow-hidden min-h-[300px]">
+                        <h3 class="text-center text-white mb-4 font-bold text-sm md:text-lg">L'Écosystème</h3>
                         
-                        <div class="relative w-full h-64">
+                        <div class="relative w-full max-w-sm h-64">
                             <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10 text-center">
-                                <div class="w-24 h-24 bg-slate-800 rounded-full border-2 border-cyan-500 flex items-center justify-center shadow-[0_0_20px_rgba(6,182,212,0.4)]">
-                                    <i class="fas fa-landmark text-3xl text-white"></i>
+                                <div class="w-16 h-16 md:w-24 md:h-24 bg-slate-800 rounded-full border-2 border-cyan-500 flex items-center justify-center shadow-[0_0_20px_rgba(6,182,212,0.4)]">
+                                    <i class="fas fa-landmark text-xl md:text-3xl text-white"></i>
                                 </div>
-                                <div class="mt-2 font-bold text-white text-sm">Trésor Public</div>
+                                <div class="mt-1 font-bold text-white text-xs">Trésor</div>
                             </div>
 
-                            <div class="absolute top-4 left-1/4 transform -translate-x-1/2 bg-emerald-900/80 px-4 py-2 rounded-lg border border-emerald-500 text-center w-32 animate-float">
-                                <span class="block font-bold text-emerald-300">TGR</span>
-                                <span class="text-[10px] text-white block">Trésorerie Générale</span>
+                            <div class="absolute top-2 left-0 transform bg-emerald-900/80 px-2 py-1 md:px-4 md:py-2 rounded-lg border border-emerald-500 text-center w-20 md:w-32 animate-float">
+                                <span class="block font-bold text-emerald-300 text-xs md:text-base">TGR</span>
                             </div>
 
-                            <div class="absolute top-4 right-1/4 transform translate-x-1/2 bg-purple-900/80 px-4 py-2 rounded-lg border border-purple-500 text-center w-32 animate-float" style="animation-delay: 1s;">
-                                <span class="block font-bold text-purple-300">DGI</span>
-                                <span class="text-[10px] text-white block">Impôts (TVA, IS, IR)</span>
+                            <div class="absolute top-2 right-0 transform bg-purple-900/80 px-2 py-1 md:px-4 md:py-2 rounded-lg border border-purple-500 text-center w-20 md:w-32 animate-float" style="animation-delay: 1s;">
+                                <span class="block font-bold text-purple-300 text-xs md:text-base">DGI</span>
                             </div>
 
-                            <div class="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-blue-900/80 px-4 py-2 rounded-lg border border-blue-500 text-center w-32 animate-float" style="animation-delay: 2s;">
-                                <span class="block font-bold text-blue-300">ADII</span>
-                                <span class="text-[10px] text-white block">Douanes</span>
+                            <div class="absolute bottom-2 left-1/2 transform -translate-x-1/2 bg-blue-900/80 px-2 py-1 md:px-4 md:py-2 rounded-lg border border-blue-500 text-center w-20 md:w-32 animate-float" style="animation-delay: 2s;">
+                                <span class="block font-bold text-blue-300 text-xs md:text-base">Douane</span>
                             </div>
 
                             <svg class="absolute inset-0 w-full h-full pointer-events-none z-0">
-                                <line x1="50%" y1="50%" x2="25%" y2="20%" stroke="#475569" stroke-width="1" stroke-dasharray="4"/>
-                                <line x1="50%" y1="50%" x2="75%" y2="20%" stroke="#475569" stroke-width="1" stroke-dasharray="4"/>
+                                <line x1="50%" y1="50%" x2="15%" y2="15%" stroke="#475569" stroke-width="1" stroke-dasharray="4"/>
+                                <line x1="50%" y1="50%" x2="85%" y2="15%" stroke="#475569" stroke-width="1" stroke-dasharray="4"/>
                                 <line x1="50%" y1="50%" x2="50%" y2="85%" stroke="#475569" stroke-width="1" stroke-dasharray="4"/>
                             </svg>
                         </div>
@@ -384,69 +402,61 @@
         </section>
 
         <section class="slide" id="slide-5">
-            <div class="max-w-6xl w-full">
-                <h2 class="text-3xl font-bold text-white mb-8">Processus de Recouvrement</h2>
+            <div class="max-w-6xl w-full my-auto">
+                <h2 class="text-2xl md:text-3xl font-bold text-white mb-6">Processus de Recouvrement</h2>
                 
-                <div class="space-y-8">
-                    <div class="relative pl-4">
-                        <div class="absolute left-0 top-0 bottom-0 w-1 bg-emerald-500 rounded-full"></div>
-                        <h3 class="text-xl font-bold text-emerald-400 mb-3">1. Phase Amiable</h3>
+                <div class="space-y-6 md:space-y-8">
+                    <div class="relative pl-4 border-l-2 border-emerald-500">
+                        <h3 class="text-lg md:text-xl font-bold text-emerald-400 mb-3">1. Phase Amiable</h3>
                         
-                        <div class="glass-card p-4 rounded-lg flex items-center justify-between gap-4">
-                            <div class="flex-1 bg-slate-800 p-3 rounded shadow-lg text-center border border-slate-700">
-                                <i class="far fa-paper-plane mb-2 text-emerald-400 text-xl"></i>
-                                <div class="font-bold text-white text-sm">Avis d'imposition</div>
-                                <div class="text-[10px] text-slate-400">Date d'exigibilité</div>
+                        <div class="glass-card p-4 rounded-lg flex flex-col md:flex-row items-center justify-between gap-4">
+                            <div class="w-full md:flex-1 bg-slate-800 p-3 rounded shadow-lg text-center border border-slate-700">
+                                <i class="far fa-paper-plane mb-2 text-emerald-400 text-lg"></i>
+                                <div class="font-bold text-white text-xs md:text-sm">Avis d'imposition</div>
                             </div>
-                            <i class="fas fa-arrow-right text-slate-500"></i>
-                            <div class="flex-1 bg-slate-800 p-3 rounded shadow-lg text-center border border-slate-700">
-                                <i class="fas fa-hourglass-half mb-2 text-emerald-400 text-xl"></i>
-                                <div class="font-bold text-white text-sm">Délai Légal</div>
-                                <div class="text-[10px] text-slate-400">Paiement volontaire</div>
+                            
+                            <i class="fas fa-arrow-down md:hidden text-slate-500"></i>
+                            <i class="fas fa-arrow-right hidden md:block text-slate-500"></i>
+                            
+                            <div class="w-full md:flex-1 bg-slate-800 p-3 rounded shadow-lg text-center border border-slate-700">
+                                <i class="fas fa-hourglass-half mb-2 text-emerald-400 text-lg"></i>
+                                <div class="font-bold text-white text-xs md:text-sm">Délai Légal</div>
                             </div>
-                            <i class="fas fa-arrow-right text-slate-500"></i>
-                            <div class="flex-1 bg-slate-800 p-3 rounded shadow-lg text-center border border-slate-700">
-                                <i class="fas fa-envelope-open-text mb-2 text-emerald-400 text-xl"></i>
-                                <div class="font-bold text-white text-sm">Dernier Avis (DAS)</div>
-                                <div class="text-[10px] text-slate-400">Sans frais (Amiable)</div>
+                            
+                            <i class="fas fa-arrow-down md:hidden text-slate-500"></i>
+                            <i class="fas fa-arrow-right hidden md:block text-slate-500"></i>
+
+                            <div class="w-full md:flex-1 bg-slate-800 p-3 rounded shadow-lg text-center border border-slate-700">
+                                <i class="fas fa-envelope-open-text mb-2 text-emerald-400 text-lg"></i>
+                                <div class="font-bold text-white text-xs md:text-sm">Dernier Avis (DAS)</div>
                             </div>
                         </div>
                     </div>
 
-                    <div class="flex justify-start pl-12">
-                        <i class="fas fa-chevron-down text-2xl text-slate-600 animate-bounce"></i>
-                    </div>
-
-                    <div class="relative pl-4">
-                        <div class="absolute left-0 top-0 bottom-0 w-1 bg-red-500 rounded-full"></div>
-                        <h3 class="text-xl font-bold text-red-400 mb-3">2. Phase Forcée (Si non-paiement)</h3>
+                    <div class="relative pl-4 border-l-2 border-red-500">
+                        <h3 class="text-lg md:text-xl font-bold text-red-400 mb-3">2. Phase Forcée</h3>
                         
-                        <div class="glass-card p-4 rounded-lg flex items-center justify-between gap-4">
-                            <div class="flex-1 bg-slate-800 p-3 rounded shadow-lg text-center border border-red-900/50 relative">
-                                <div class="absolute -top-2 -right-2 bg-red-600 text-[10px] px-2 rounded-full text-white">Majoration</div>
-                                <i class="fas fa-exclamation-circle mb-2 text-red-400 text-xl"></i>
-                                <div class="font-bold text-white text-sm">Commandement</div>
+                        <div class="glass-card p-4 rounded-lg flex flex-col md:flex-row items-center justify-between gap-4">
+                            <div class="w-full md:flex-1 bg-slate-800 p-3 rounded shadow-lg text-center border border-red-900/50">
+                                <i class="fas fa-exclamation-circle mb-2 text-red-400 text-lg"></i>
+                                <div class="font-bold text-white text-xs md:text-sm">Commandement</div>
                             </div>
-                            <i class="fas fa-arrow-right text-red-900"></i>
-                            <div class="flex-1 bg-slate-800 p-3 rounded shadow-lg text-center border border-red-900/50">
-                                <i class="fas fa-hand-holding-usd mb-2 text-red-400 text-xl"></i>
-                                <div class="font-bold text-white text-sm">Saisie</div>
-                                <div class="text-[10px] text-slate-400">Comptes, Biens</div>
+                            
+                            <i class="fas fa-arrow-down md:hidden text-red-900"></i>
+                            <i class="fas fa-arrow-right hidden md:block text-red-900"></i>
+
+                            <div class="w-full md:flex-1 bg-slate-800 p-3 rounded shadow-lg text-center border border-red-900/50">
+                                <i class="fas fa-hand-holding-usd mb-2 text-red-400 text-lg"></i>
+                                <div class="font-bold text-white text-xs md:text-sm">Saisie</div>
                             </div>
-                            <i class="fas fa-arrow-right text-red-900"></i>
-                            <div class="flex-1 bg-slate-800 p-3 rounded shadow-lg text-center border border-red-900/50">
-                                <i class="fas fa-gavel mb-2 text-red-400 text-xl"></i>
-                                <div class="font-bold text-white text-sm">Vente Forcée</div>
-                                <div class="text-[10px] text-slate-400">Enchères publiques</div>
+                            
+                            <i class="fas fa-arrow-down md:hidden text-red-900"></i>
+                            <i class="fas fa-arrow-right hidden md:block text-red-900"></i>
+
+                            <div class="w-full md:flex-1 bg-slate-800 p-3 rounded shadow-lg text-center border border-red-900/50">
+                                <i class="fas fa-gavel mb-2 text-red-400 text-lg"></i>
+                                <div class="font-bold text-white text-xs md:text-sm">Vente Forcée</div>
                             </div>
-                        </div>
-                    </div>
-                    
-                    <div class="mt-4 glass-card p-3 rounded border border-yellow-500/30 text-left flex items-center gap-3 bg-yellow-900/10">
-                        <div class="bg-yellow-500 text-black p-2 rounded-lg"><i class="fas fa-bolt"></i></div>
-                        <div class="text-sm">
-                            <span class="font-bold text-yellow-400">ATD (Avis à Tiers Détenteur) :</span> 
-                            L'outil le plus efficace. Permet de saisir les fonds directement à la source (Banques, Employeurs, Locataires) sans passer par la vente de biens.
                         </div>
                     </div>
                 </div>
@@ -454,82 +464,61 @@
         </section>
 
         <section class="slide" id="slide-6">
-            <div class="max-w-6xl w-full">
-                <h2 class="text-3xl font-bold text-white mb-2">Statistiques Officielles du Recouvrement</h2>
-                <div class="flex items-center gap-2 mb-8">
-                    <span class="bg-cyan-500 text-black text-xs px-2 py-1 rounded font-bold">DATA</span>
-                    <p class="text-slate-400 text-sm">Source : TGR & DGI (Données 2023)</p>
+            <div class="max-w-6xl w-full my-auto">
+                <h2 class="text-2xl md:text-3xl font-bold text-white mb-2">Statistiques 2023</h2>
+                <div class="flex items-center gap-2 mb-6">
+                    <span class="bg-cyan-500 text-black text-[10px] md:text-xs px-2 py-1 rounded font-bold">DATA TGR & DGI</span>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     
-                    <div class="glass-card p-6 rounded-xl relative flex flex-col h-full">
-                        <h3 class="text-lg font-bold text-white mb-6 text-left border-b border-slate-700 pb-2">Evolution des Recettes Fiscales (MMDH)</h3>
-                        <div class="flex flex-col space-y-5 w-full justify-end flex-grow pb-4 relative pl-8">
-                            <div class="absolute left-0 top-0 h-full flex flex-col justify-between text-xs text-slate-500 py-2">
-                                <span>300</span><span>150</span><span>0</span>
-                            </div>
-
-                            <div class="w-full flex items-center group">
-                                <div class="w-12 text-xs text-left mr-2 text-slate-400 font-bold">2021</div>
-                                <div class="flex-grow bg-slate-800 h-8 rounded-r-full overflow-hidden mr-2 relative">
-                                    <div class="bg-cyan-700 h-full bar-fill flex items-center justify-end pr-3 text-xs font-bold shadow-[0_0_10px_rgba(8,145,178,0.5)]" data-width="75%">230</div>
+                    <div class="glass-card p-4 md:p-6 rounded-xl flex flex-col w-full">
+                        <h3 class="text-sm md:text-lg font-bold text-white mb-4 border-b border-slate-700 pb-2">Recettes Fiscales (MMDH)</h3>
+                        <div class="flex flex-col space-y-4 w-full">
+                            <div class="w-full flex items-center">
+                                <span class="w-8 text-xs text-slate-400">2021</span>
+                                <div class="flex-grow bg-slate-800 h-6 rounded-r-full ml-2 relative">
+                                    <div class="bg-cyan-700 h-full bar-fill flex items-center justify-end pr-2 text-[10px] font-bold" data-width="75%">230</div>
                                 </div>
                             </div>
-                            <div class="w-full flex items-center group">
-                                <div class="w-12 text-xs text-left mr-2 text-slate-400 font-bold">2022</div>
-                                <div class="flex-grow bg-slate-800 h-8 rounded-r-full overflow-hidden mr-2 relative">
-                                    <div class="bg-cyan-500 h-full bar-fill flex items-center justify-end pr-3 text-xs font-bold shadow-[0_0_10px_rgba(6,182,212,0.5)]" data-width="82%">255</div>
+                            <div class="w-full flex items-center">
+                                <span class="w-8 text-xs text-slate-400">2022</span>
+                                <div class="flex-grow bg-slate-800 h-6 rounded-r-full ml-2 relative">
+                                    <div class="bg-cyan-500 h-full bar-fill flex items-center justify-end pr-2 text-[10px] font-bold" data-width="82%">255</div>
                                 </div>
                             </div>
-                             <div class="w-full flex items-center group">
-                                <div class="w-12 text-xs text-left mr-2 text-slate-400 font-bold">2023</div>
-                                <div class="flex-grow bg-slate-800 h-8 rounded-r-full overflow-hidden mr-2 relative">
-                                    <div class="bg-emerald-400 h-full bar-fill flex items-center justify-end pr-3 text-black font-bold shadow-[0_0_15px_rgba(52,211,153,0.6)]" data-width="90%">278</div>
+                             <div class="w-full flex items-center">
+                                <span class="w-8 text-xs text-slate-400">2023</span>
+                                <div class="flex-grow bg-slate-800 h-6 rounded-r-full ml-2 relative">
+                                    <div class="bg-emerald-400 h-full bar-fill flex items-center justify-end pr-2 text-black text-[10px] font-bold" data-width="90%">278</div>
                                 </div>
                             </div>
-                        </div>
-                        <div class="mt-auto pt-2 text-[10px] text-slate-500 text-left italic">
-                            *MMDH : Milliards de Dirhams. <br>
-                            Source : Bulletin Mensuel de Statistiques des Finances Publiques (BMSFP), TGR Décembre 2023.
                         </div>
                     </div>
 
-                    <div class="glass-card p-6 rounded-xl flex flex-col items-center justify-start relative h-full">
-                        <h3 class="text-lg font-bold text-white mb-6 text-left w-full border-b border-slate-700 pb-2">Structure des Recettes (2023)</h3>
+                    <div class="glass-card p-4 md:p-6 rounded-xl flex flex-col items-center">
+                        <h3 class="text-sm md:text-lg font-bold text-white mb-4 border-b border-slate-700 pb-2 w-full text-left">Structure des Recettes</h3>
                         
-                        <div class="flex flex-row items-center justify-between w-full mt-4">
-                            <div class="relative w-40 h-40">
+                        <div class="flex flex-col sm:flex-row items-center w-full gap-6">
+                            <div class="relative w-32 h-32 md:w-40 md:h-40 shrink-0">
                                 <svg width="100%" height="100%" viewBox="0 0 42 42">
-                                    <circle cx="21" cy="21" r="15.91549430918954" fill="transparent" stroke="#1e293b" stroke-width="5"></circle>
-                                    
-                                    <circle cx="21" cy="21" r="15.91549430918954" fill="transparent" stroke="#10b981" stroke-width="5" 
-                                        stroke-dasharray="40 60" stroke-dashoffset="25"></circle>
-                                    
-                                    <circle cx="21" cy="21" r="15.91549430918954" fill="transparent" stroke="#8b5cf6" stroke-width="5" 
-                                        stroke-dasharray="30 70" stroke-dashoffset="-15"></circle>
-                                    
-                                    <circle cx="21" cy="21" r="15.91549430918954" fill="transparent" stroke="#06b6d4" stroke-width="5" 
-                                        stroke-dasharray="20 80" stroke-dashoffset="-45"></circle>
-
-                                     <circle cx="21" cy="21" r="15.91549430918954" fill="transparent" stroke="#f97316" stroke-width="5" 
-                                     stroke-dasharray="10 90" stroke-dashoffset="-65"></circle>
+                                    <circle cx="21" cy="21" r="15.915" fill="transparent" stroke="#1e293b" stroke-width="5"></circle>
+                                    <circle cx="21" cy="21" r="15.915" fill="transparent" stroke="#10b981" stroke-width="5" stroke-dasharray="40 60" stroke-dashoffset="25"></circle>
+                                    <circle cx="21" cy="21" r="15.915" fill="transparent" stroke="#8b5cf6" stroke-width="5" stroke-dasharray="30 70" stroke-dashoffset="-15"></circle>
+                                    <circle cx="21" cy="21" r="15.915" fill="transparent" stroke="#06b6d4" stroke-width="5" stroke-dasharray="20 80" stroke-dashoffset="-45"></circle>
+                                    <circle cx="21" cy="21" r="15.915" fill="transparent" stroke="#f97316" stroke-width="5" stroke-dasharray="10 90" stroke-dashoffset="-65"></circle>
                                 </svg>
-                                <div class="absolute inset-0 flex items-center justify-center flex-col">
-                                    <span class="font-bold text-white text-lg">100%</span>
+                                <div class="absolute inset-0 flex items-center justify-center">
+                                    <span class="font-bold text-white text-sm">100%</span>
                                 </div>
                             </div>
 
-                            <div class="flex flex-col gap-3 text-sm ml-4">
+                            <div class="grid grid-cols-2 sm:grid-cols-1 gap-2 text-xs md:text-sm w-full">
                                 <div class="flex items-center"><span class="w-3 h-3 bg-emerald-500 rounded-full mr-2"></span>TVA (~40%)</div>
                                 <div class="flex items-center"><span class="w-3 h-3 bg-purple-500 rounded-full mr-2"></span>IS (~30%)</div>
                                 <div class="flex items-center"><span class="w-3 h-3 bg-cyan-500 rounded-full mr-2"></span>IR (~20%)</div>
-                                <div class="flex items-center"><span class="w-3 h-3 bg-orange-500 rounded-full mr-2"></span>Autres (~10%)</div>
+                                <div class="flex items-center"><span class="w-3 h-3 bg-orange-500 rounded-full mr-2"></span>Autre</div>
                             </div>
-                        </div>
-                        
-                        <div class="mt-auto pt-4 text-[10px] text-slate-500 text-left italic w-full">
-                            Source : Rapport d'activité de la Direction Générale des Impôts (DGI) 2023.
                         </div>
                     </div>
                 </div>
@@ -537,149 +526,103 @@
         </section>
 
         <section class="slide" id="slide-7">
-            <div class="max-w-5xl w-full">
-                <h2 class="text-3xl font-bold text-white mb-8 border-l-4 border-red-500 pl-4">Défis et Obstacles Majeurs</h2>
+            <div class="max-w-5xl w-full my-auto">
+                <h2 class="text-2xl md:text-3xl font-bold text-white mb-6 border-l-4 border-red-500 pl-4">Défis Majeurs</h2>
                 
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div class="glass-card p-6 rounded-lg border-t-2 border-red-500 hover:-translate-y-2 transition duration-300">
-                        <div class="bg-red-900/20 w-12 h-12 rounded-full flex items-center justify-center mb-4">
-                            <i class="fas fa-chart-pie text-2xl text-red-500"></i>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
+                    <div class="glass-card p-4 md:p-6 rounded-lg border-t-2 border-red-500">
+                        <div class="flex items-center mb-2">
+                            <i class="fas fa-chart-pie text-xl text-red-500 mr-3"></i>
+                            <h3 class="text-lg font-bold text-white">Le RAR</h3>
                         </div>
-                        <h3 class="text-xl font-bold mb-2 text-white">Le "Reste à Recouvrer" (RAR)</h3>
-                        <p class="text-slate-400 text-sm leading-relaxed">Le stock des créances accumulées reste historiquement élevé. Selon la Cour des Comptes, le RAR dépasse les 100 MMDH, constituant un manque à gagner structurel.</p>
+                        <p class="text-slate-400 text-xs md:text-sm">Le "Reste à Recouvrer" dépasse les 100 MMDH (Manque à gagner structurel).</p>
                     </div>
 
-                    <div class="glass-card p-6 rounded-lg border-t-2 border-orange-500 hover:-translate-y-2 transition duration-300">
-                        <div class="bg-orange-900/20 w-12 h-12 rounded-full flex items-center justify-center mb-4">
-                             <i class="fas fa-store-slash text-2xl text-orange-500"></i>
+                    <div class="glass-card p-4 md:p-6 rounded-lg border-t-2 border-orange-500">
+                        <div class="flex items-center mb-2">
+                            <i class="fas fa-store-slash text-xl text-orange-500 mr-3"></i>
+                            <h3 class="text-lg font-bold text-white">Informel</h3>
                         </div>
-                        <h3 class="text-xl font-bold mb-2 text-white">Secteur Informel</h3>
-                        <p class="text-slate-400 text-sm leading-relaxed">Une part significative de l'économie marocaine échappe à l'impôt, rendant le recouvrement difficile par manque de traçabilité et d'identification des redevables.</p>
+                        <p class="text-slate-400 text-xs md:text-sm">Une part de l'économie échappe à l'impôt (manque de traçabilité).</p>
                     </div>
 
-                    <div class="glass-card p-6 rounded-lg border-t-2 border-yellow-500 hover:-translate-y-2 transition duration-300">
-                        <div class="bg-yellow-900/20 w-12 h-12 rounded-full flex items-center justify-center mb-4">
-                            <i class="fas fa-file-contract text-2xl text-yellow-500"></i>
+                    <div class="glass-card p-4 md:p-6 rounded-lg border-t-2 border-yellow-500">
+                        <div class="flex items-center mb-2">
+                            <i class="fas fa-file-contract text-xl text-yellow-500 mr-3"></i>
+                            <h3 class="text-lg font-bold text-white">Procédure</h3>
                         </div>
-                        <h3 class="text-xl font-bold mb-2 text-white">Lourdeur Procédurale</h3>
-                        <p class="text-slate-400 text-sm leading-relaxed">Les délais de notification physique et les contentieux judiciaires freinent l'efficacité. La complexité de certaines procédures favorise l'évitement fiscal.</p>
+                        <p class="text-slate-400 text-xs md:text-sm">Lourdeur des notifications physiques et contentieux judiciaires.</p>
                     </div>
                 </div>
             </div>
         </section>
 
         <section class="slide" id="slide-8">
-            <div class="max-w-6xl w-full">
-                <div class="flex items-center mb-8">
-                    <h2 class="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500">
+            <div class="max-w-6xl w-full my-auto">
+                <div class="mb-6">
+                    <h2 class="text-2xl md:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500">
                         Transformation Numérique
                     </h2>
-                    <span class="ml-4 px-3 py-1 bg-blue-900 text-blue-300 text-xs rounded-full border border-blue-500">Cœur du Master</span>
+                    <span class="inline-block mt-2 px-3 py-1 bg-blue-900 text-blue-300 text-[10px] rounded-full border border-blue-500">Focus Master</span>
                 </div>
 
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
-                    <div class="space-y-6">
-                        <div class="glass-card p-5 rounded-lg flex items-start border-l-4 border-cyan-500 hover:bg-slate-800 transition">
-                            <div class="bg-cyan-900/50 p-3 rounded-lg mr-4 flex-shrink-0">
-                                <i class="fas fa-network-wired text-cyan-400 text-xl"></i>
-                            </div>
+                <div class="flex flex-col md:grid md:grid-cols-2 gap-6 items-center">
+                    <div class="space-y-4 w-full">
+                        <div class="glass-card p-3 md:p-5 rounded-lg flex items-start border-l-4 border-cyan-500">
+                            <div class="mr-3 mt-1"><i class="fas fa-network-wired text-cyan-400"></i></div>
                             <div>
-                                <h4 class="font-bold text-lg text-white">Interopérabilité (Data Exchange)</h4>
-                                <p class="text-slate-400 text-sm mt-1">Échange automatique de données entre la TGR, la DGI, la Douane, l'OMPIC et la Conservation Foncière pour identifier le patrimoine des débiteurs.</p>
+                                <h4 class="font-bold text-sm md:text-lg text-white">Data Exchange</h4>
+                                <p class="text-slate-400 text-xs md:text-sm">Échange TGR-DGI-Douane-OMPIC.</p>
                             </div>
                         </div>
 
-                        <div class="glass-card p-5 rounded-lg flex items-start border-l-4 border-purple-500 hover:bg-slate-800 transition">
-                            <div class="bg-purple-900/50 p-3 rounded-lg mr-4 flex-shrink-0">
-                                <i class="fas fa-mobile-alt text-purple-400 text-xl"></i>
-                            </div>
+                        <div class="glass-card p-3 md:p-5 rounded-lg flex items-start border-l-4 border-purple-500">
+                            <div class="mr-3 mt-1"><i class="fas fa-mobile-alt text-purple-400"></i></div>
                             <div>
-                                <h4 class="font-bold text-lg text-white">Paiement Multicanal</h4>
-                                <p class="text-slate-400 text-sm mt-1">Dématérialisation totale : Paiement via portail TGR, applications bancaires, et GAB. Fin progressive du paiement en espèces aux guichets.</p>
+                                <h4 class="font-bold text-sm md:text-lg text-white">Paiement Multicanal</h4>
+                                <p class="text-slate-400 text-xs md:text-sm">App Mobile, GAB, Portail TGR.</p>
                             </div>
                         </div>
 
-                        <div class="glass-card p-5 rounded-lg flex items-start border-l-4 border-emerald-500 hover:bg-slate-800 transition">
-                            <div class="bg-emerald-900/50 p-3 rounded-lg mr-4 flex-shrink-0">
-                                <i class="fas fa-robot text-emerald-400 text-xl"></i>
-                            </div>
+                        <div class="glass-card p-3 md:p-5 rounded-lg flex items-start border-l-4 border-emerald-500">
+                            <div class="mr-3 mt-1"><i class="fas fa-robot text-emerald-400"></i></div>
                             <div>
-                                <h4 class="font-bold text-lg text-white">Big Data & IA</h4>
-                                <p class="text-slate-400 text-sm mt-1">Analyse prédictive pour le scoring des contribuables (Risk Management) et détection précoce des défaillances de paiement.</p>
+                                <h4 class="font-bold text-sm md:text-lg text-white">Big Data & IA</h4>
+                                <p class="text-slate-400 text-xs md:text-sm">Scoring de risque et prédiction.</p>
                             </div>
                         </div>
                     </div>
 
-                    <div class="relative h-80 bg-slate-800 rounded-2xl border border-slate-700 overflow-hidden flex items-center justify-center shadow-2xl">
-                        <div class="absolute inset-0 opacity-20" style="background-image: radial-gradient(#06b6d4 1px, transparent 1px); background-size: 20px 20px;"></div>
-                        
-                        <div class="text-center z-10 space-y-4">
-                            <div class="inline-block p-6 rounded-full bg-slate-900 border-2 border-cyan-500 shadow-[0_0_30px_rgba(6,182,212,0.4)] animate-pulse">
-                                <i class="fas fa-laptop-code text-5xl text-white"></i>
-                            </div>
-                            <h3 class="text-3xl font-bold text-white tracking-wider">SIMPL & GIR</h3>
-                            <p class="text-cyan-400 text-sm font-mono">Systèmes Intégrés de Gestion des Recettes</p>
-                        </div>
-                        
-                        <div class="absolute top-10 left-10 w-2 h-2 bg-emerald-500 rounded-full animate-ping"></div>
-                        <div class="absolute bottom-10 right-10 w-2 h-2 bg-purple-500 rounded-full animate-ping delay-700"></div>
-                        <div class="absolute top-1/2 left-5 w-1 h-1 bg-white rounded-full animate-ping delay-300"></div>
+                    <div class="w-full h-40 md:h-80 bg-slate-800 rounded-2xl border border-slate-700 overflow-hidden flex flex-col items-center justify-center relative mt-4 md:mt-0">
+                         <div class="absolute inset-0 opacity-20" style="background-image: radial-gradient(#06b6d4 1px, transparent 1px); background-size: 20px 20px;"></div>
+                         <i class="fas fa-laptop-code text-4xl md:text-5xl text-white mb-2"></i>
+                         <h3 class="text-xl md:text-3xl font-bold text-white">SIMPL</h3>
+                         <p class="text-cyan-400 text-xs font-mono">Système Intégré</p>
                     </div>
                 </div>
             </div>
         </section>
 
         <section class="slide" id="slide-9">
-             <div class="max-w-5xl w-full">
-                <h2 class="text-3xl font-bold text-white mb-8 border-b border-slate-700 pb-4">
-                    <i class="fas fa-book-reader mr-3 text-cyan-500"></i>Références et Sources Officielles
+             <div class="max-w-5xl w-full my-auto">
+                <h2 class="text-2xl md:text-3xl font-bold text-white mb-6">
+                    <i class="fas fa-book-reader mr-2 text-cyan-500"></i>Références
                 </h2>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div class="glass-card p-6 rounded-xl">
-                        <h3 class="text-xl font-bold text-emerald-400 mb-4">Textes Juridiques</h3>
-                        <ul class="space-y-4">
-                            <li class="flex items-start">
-                                <i class="fas fa-gavel text-slate-500 mr-3 mt-1"></i>
-                                <div>
-                                    <span class="block font-bold text-white">Loi n° 15-97</span>
-                                    <span class="text-sm text-slate-400">Formant Code de Recouvrement des Créances Publiques (CRCP).</span>
-                                </div>
-                            </li>
-                            <li class="flex items-start">
-                                <i class="fas fa-scroll text-slate-500 mr-3 mt-1"></i>
-                                <div>
-                                    <span class="block font-bold text-white">Lois de Finances (2023 - 2024)</span>
-                                    <span class="text-sm text-slate-400">Dispositions relatives aux recettes fiscales et douanières.</span>
-                                </div>
-                            </li>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="glass-card p-4 rounded-xl">
+                        <h3 class="text-base md:text-xl font-bold text-emerald-400 mb-2">Textes Juridiques</h3>
+                        <ul class="text-xs md:text-sm text-slate-300 space-y-2">
+                            <li>• Loi 15-97 (Code de Recouvrement)</li>
+                            <li>• Lois de Finances 2023-2024</li>
                         </ul>
                     </div>
-
-                    <div class="glass-card p-6 rounded-xl">
-                        <h3 class="text-xl font-bold text-purple-400 mb-4">Rapports & Statistiques</h3>
-                        <ul class="space-y-4">
-                            <li class="flex items-start">
-                                <i class="fas fa-file-pdf text-red-400 mr-3 mt-1"></i>
-                                <div>
-                                    <span class="block font-bold text-white">TGR (Trésorerie Générale du Royaume)</span>
-                                    <span class="text-sm text-slate-400">Bulletin Mensuel de Statistiques des Finances Publiques (BMSFP), Déc. 2023.</span>
-                                </div>
-                            </li>
-                            <li class="flex items-start">
-                                <i class="fas fa-file-pdf text-red-400 mr-3 mt-1"></i>
-                                <div>
-                                    <span class="block font-bold text-white">DGI (Direction Générale des Impôts)</span>
-                                    <span class="text-sm text-slate-400">Rapport annuel d'activité 2023.</span>
-                                </div>
-                            </li>
-                            <li class="flex items-start">
-                                <i class="fas fa-balance-scale-right text-slate-500 mr-3 mt-1"></i>
-                                <div>
-                                    <span class="block font-bold text-white">Cour des Comptes</span>
-                                    <span class="text-sm text-slate-400">Rapport sur l'exécution du budget de l'État (Focus sur le RAR).</span>
-                                </div>
-                            </li>
+                    <div class="glass-card p-4 rounded-xl">
+                        <h3 class="text-base md:text-xl font-bold text-purple-400 mb-2">Rapports</h3>
+                        <ul class="text-xs md:text-sm text-slate-300 space-y-2">
+                            <li>• Bulletin TGR (Déc. 2023)</li>
+                            <li>• Rapport d'activité DGI 2023</li>
+                            <li>• Rapport Cour des Comptes</li>
                         </ul>
                     </div>
                 </div>
@@ -687,43 +630,40 @@
         </section>
 
         <section class="slide" id="slide-10">
-            <div class="max-w-4xl w-full text-left">
-                <h2 class="text-4xl font-bold text-white mb-8">Conclusion & Perspectives</h2>
+            <div class="max-w-4xl w-full text-left my-auto">
+                <h2 class="text-2xl md:text-4xl font-bold text-white mb-6">Conclusion</h2>
                 
-                <div class="glass-card p-8 rounded-2xl mb-8 transform transition hover:scale-105 duration-500 border-l-4 border-emerald-500 bg-gradient-to-r from-slate-800 to-transparent">
-                    <p class="text-xl text-slate-200 leading-relaxed">
-                        Le recouvrement des créances publiques au Maroc connaît une mutation profonde. Si le cadre juridique (Loi 15-97) a apporté les garanties nécessaires, la véritable révolution est <span class="text-emerald-400 font-bold">numérique</span>.
-                    </p>
-                    <hr class="border-slate-600 my-6 w-full">
-                    <p class="text-lg text-slate-300">
-                        L'avenir réside dans la <span class="text-cyan-400 font-bold">digitalisation intégrale</span> du parcours du contribuable, le renforcement de l'interopérabilité entre administrations, et l'amélioration de la relation de confiance (Civisme Fiscal).
+                <div class="glass-card p-6 md:p-8 rounded-2xl mb-8 border-l-4 border-emerald-500">
+                    <p class="text-base md:text-xl text-slate-200 leading-relaxed">
+                        Le recouvrement connaît une mutation profonde. La <span class="text-emerald-400 font-bold">digitalisation intégrale</span> et l'interopérabilité sont les clés de l'avenir pour améliorer le Civisme Fiscal.
                     </p>
                 </div>
 
-                <div class="flex justify-start gap-4 mt-8">
-                    <button onclick="location.reload()" class="px-6 py-3 rounded-full bg-slate-700 hover:bg-slate-600 text-white transition flex items-center gap-2 border border-slate-500">
+                <div class="flex justify-start gap-4">
+                    <button onclick="location.reload()" class="px-4 py-2 md:px-6 md:py-3 rounded-full bg-slate-700 text-white text-sm md:text-base border border-slate-500">
                         <i class="fas fa-redo"></i> Rejouer
                     </button>
-                    <button onclick="window.print()" class="px-6 py-3 rounded-full bg-cyan-600 hover:bg-cyan-500 text-white transition flex items-center gap-2 shadow-lg shadow-cyan-500/30">
-                        <i class="fas fa-print"></i> Mode Impression
+                    <button onclick="window.print()" class="px-4 py-2 md:px-6 md:py-3 rounded-full bg-cyan-600 text-white text-sm md:text-base shadow-lg hidden md:flex items-center gap-2">
+                        <i class="fas fa-print"></i> Imprimer
                     </button>
                 </div>
 
-                <footer class="mt-16 text-slate-500 text-sm border-t border-slate-800 pt-4">
-                    <p>Merci de votre attention.</p>
-                    <p class="mt-1 text-xs opacity-50">Master Transformation Numérique des Finances Publiques • 2024/2025</p>
+                <footer class="mt-8 text-slate-500 text-xs border-t border-slate-800 pt-4">
+                    <p>Master Transformation Numérique des Finances Publiques • 2024/2025</p>
                 </footer>
             </div>
         </section>
 
     </main>
 
-    <div class="nav-controls glass-card px-4 py-2 rounded-full border border-slate-600/50">
-        <button id="prevBtn" class="w-10 h-10 rounded-full bg-slate-700 hover:bg-cyan-600 text-white transition flex items-center justify-center disabled:opacity-30 disabled:cursor-not-allowed" aria-label="Previous Slide">
+    <div class="nav-controls glass-card rounded-full border border-slate-600/50">
+        <button id="prevBtn" class="w-10 h-10 md:w-12 md:h-12 rounded-full bg-slate-700 active:bg-cyan-600 hover:md:bg-cyan-600 text-white transition flex items-center justify-center disabled:opacity-30" aria-label="Previous">
             <i class="fas fa-chevron-left"></i>
         </button>
-        <span id="slideIndicator" class="text-sm font-mono text-cyan-400 w-16 text-center">1 / 11</span>
-        <button id="nextBtn" class="w-10 h-10 rounded-full bg-slate-700 hover:bg-cyan-600 text-white transition flex items-center justify-center disabled:opacity-30 disabled:cursor-not-allowed" aria-label="Next Slide">
+        
+        <span id="slideIndicator" class="text-xs md:text-sm font-mono text-cyan-400 font-bold">1 / 11</span>
+        
+        <button id="nextBtn" class="w-10 h-10 md:w-12 md:h-12 rounded-full bg-slate-700 active:bg-cyan-600 hover:md:bg-cyan-600 text-white transition flex items-center justify-center disabled:opacity-30" aria-label="Next">
             <i class="fas fa-chevron-right"></i>
         </button>
     </div>
@@ -745,14 +685,14 @@
                 slide.style.opacity = '0';
                 setTimeout(() => {
                     if(!slide.classList.contains('active')) slide.style.display = 'none';
-                }, 600);
+                }, 500);
             });
 
             // Show active
             const activeSlide = slides[index];
-            activeSlide.style.display = 'flex';
+            activeSlide.style.display = 'flex'; // Important: set flex before opacity
             
-            // Allow DOM to update display:flex before triggering transition
+            // Allow DOM to update display before triggering transition
             setTimeout(() => {
                 activeSlide.classList.add('active');
                 activeSlide.style.opacity = '1';
@@ -766,6 +706,9 @@
             indicator.textContent = `${index + 1} / ${totalSlides}`;
             prevBtn.disabled = index === 0;
             nextBtn.disabled = index === totalSlides - 1;
+
+            // Scroll to top of new slide (for mobile)
+            activeSlide.scrollTop = 0;
         }
 
         function nextSlide() {
@@ -780,7 +723,6 @@
         function animateCharts() {
             const bars = document.querySelectorAll('.bar-fill');
             bars.forEach(bar => {
-                // Reset width to 0 first to replay animation
                 bar.style.width = '0%';
                 setTimeout(() => {
                     bar.style.width = bar.getAttribute('data-width');
@@ -792,23 +734,43 @@
         prevBtn.addEventListener('click', prevSlide);
         nextBtn.addEventListener('click', nextSlide);
 
-        // Keyboard navigation (ArrowRight is Next in LTR)
+        // Keyboard navigation
         document.addEventListener('keydown', (e) => {
             if (e.key === 'ArrowRight') nextSlide();
             if (e.key === 'ArrowLeft') prevSlide();
         });
 
+        // Touch Swipe Support (Basic)
+        let touchStartX = 0;
+        let touchEndX = 0;
+        
+        document.addEventListener('touchstart', e => {
+            touchStartX = e.changedTouches[0].screenX;
+        });
+
+        document.addEventListener('touchend', e => {
+            touchEndX = e.changedTouches[0].screenX;
+            handleSwipe();
+        });
+
+        function handleSwipe() {
+            if (touchEndX < touchStartX - 50) nextSlide(); // Swipe Left -> Next
+            if (touchEndX > touchStartX + 50) prevSlide(); // Swipe Right -> Prev
+        }
+
         // Initialize
         updateSlide(0);
 
-
-        // --- 5. CANVAS ANIMATED BACKGROUND (Network Data Effect) ---
+        // --- 5. CANVAS ANIMATED BACKGROUND (Optimized for Mobile) ---
         const canvas = document.getElementById('bg-canvas');
         const ctx = canvas.getContext('2d');
         let width, height;
         let particles = [];
+        
+        // Reduce particle count on mobile for performance
+        const isMobile = window.innerWidth < 768;
+        const particleCount = isMobile ? 35 : 70;
 
-        // Resize handling
         function resize() {
             width = window.innerWidth;
             height = window.innerHeight;
@@ -818,54 +780,46 @@
         window.addEventListener('resize', resize);
         resize();
 
-        // Particle Class
         class Particle {
             constructor() {
                 this.x = Math.random() * width;
                 this.y = Math.random() * height;
-                this.vx = (Math.random() - 0.5) * 0.5; // Slow movement
+                this.vx = (Math.random() - 0.5) * 0.5;
                 this.vy = (Math.random() - 0.5) * 0.5;
                 this.size = Math.random() * 2 + 1;
             }
             update() {
                 this.x += this.vx;
                 this.y += this.vy;
-                // Bounce off edges
                 if (this.x < 0 || this.x > width) this.vx *= -1;
                 if (this.y < 0 || this.y > height) this.vy *= -1;
             }
             draw() {
                 ctx.beginPath();
                 ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-                ctx.fillStyle = 'rgba(6, 182, 212, 0.4)'; // Cyan with opacity
+                ctx.fillStyle = 'rgba(6, 182, 212, 0.4)';
                 ctx.fill();
             }
         }
 
-        // Init Particles
-        for (let i = 0; i < 70; i++) {
+        for (let i = 0; i < particleCount; i++) {
             particles.push(new Particle());
         }
 
-        // Animation Loop
         function animate() {
             ctx.clearRect(0, 0, width, height);
-            
-            // Draw connections
             for (let i = 0; i < particles.length; i++) {
                 const p1 = particles[i];
                 p1.update();
                 p1.draw();
-                
                 for (let j = i + 1; j < particles.length; j++) {
                     const p2 = particles[j];
                     const dx = p1.x - p2.x;
                     const dy = p1.y - p2.y;
                     const dist = Math.sqrt(dx * dx + dy * dy);
-                    
-                    if (dist < 120) {
+                    if (dist < 100) {
                         ctx.beginPath();
-                        ctx.strokeStyle = `rgba(6, 182, 212, ${1 - dist/120})`; // Fade line by distance
+                        ctx.strokeStyle = `rgba(6, 182, 212, ${1 - dist/100})`;
                         ctx.lineWidth = 0.5;
                         ctx.moveTo(p1.x, p1.y);
                         ctx.lineTo(p2.x, p2.y);
@@ -876,7 +830,6 @@
             requestAnimationFrame(animate);
         }
         animate();
-
     </script>
 </body>
 </html>
